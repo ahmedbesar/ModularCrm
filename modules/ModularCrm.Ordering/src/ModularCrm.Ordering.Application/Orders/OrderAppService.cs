@@ -1,5 +1,6 @@
 ﻿using ModularCrm.Ordering.Orders.Dtos;
 using ModularCrm.Ordering.Orders.Enums;
+using ModularCrm.Ordering.Orders.Events;
 using ModularCrm.Ordering.Orders.Interfaces;
 using ModularCrm.Products.Integration;
 using System;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.EventBus.Distributed;
 
 namespace ModularCrm.Ordering.Orders
 {
@@ -15,12 +17,14 @@ namespace ModularCrm.Ordering.Orders
     {
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IRepository<Order> _orderRepository;
+        private readonly IDistributedEventBus _distributedEventBus;
 
         public OrderAppService(IRepository<Order, Guid> orderRepository
-            , IProductIntegrationService productIntegrationService)
+            , IProductIntegrationService productIntegrationService, IDistributedEventBus distributedEventBus)
         {
             _orderRepository = orderRepository;
             _productIntegrationService = productIntegrationService;
+            _distributedEventBus = distributedEventBus;
         }
 
         public async Task<List<OrderDto>> GetListAsync()
@@ -52,6 +56,8 @@ namespace ModularCrm.Ordering.Orders
             };
 
             await _orderRepository.InsertAsync(order);
+            await _distributedEventBus.PublishAsync(
+                new OrderPlacedEto { CustomerName =order.CustomerName,ProductId=order.ProductId});
         }
     }
 }
