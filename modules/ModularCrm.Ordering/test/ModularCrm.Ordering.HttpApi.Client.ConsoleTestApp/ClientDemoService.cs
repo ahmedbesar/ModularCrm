@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using IdentityModel.Client;
 using Microsoft.Extensions.Configuration;
-using ModularCrm.Ordering.Samples;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.IdentityModel;
 
@@ -11,16 +10,13 @@ namespace ModularCrm.Ordering;
 
 public class ClientDemoService : ITransientDependency
 {
-    private readonly ISampleAppService _sampleAppService;
     private readonly IIdentityModelAuthenticationService _authenticationService;
     private readonly IConfiguration _configuration;
 
     public ClientDemoService(
-        ISampleAppService sampleAppService,
         IIdentityModelAuthenticationService authenticationService,
         IConfiguration configuration)
     {
-        _sampleAppService = sampleAppService;
         _authenticationService = authenticationService;
         _configuration = configuration;
     }

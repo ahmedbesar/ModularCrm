@@ -11,6 +11,7 @@ namespace ModularCrm.Ordering.Orders.Dtos
     {
         public Guid Id { get; set; }
         public string CustomerName { get; set; }
+        public string ProductName { get; set; } 
         public Guid ProductId { get; set; }
         public OrderState State { get; set; }
     }

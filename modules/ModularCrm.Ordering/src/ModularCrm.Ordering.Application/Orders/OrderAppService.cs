@@ -1,6 +1,7 @@
 ﻿using ModularCrm.Ordering.Orders.Dtos;
 using ModularCrm.Ordering.Orders.Enums;
 using ModularCrm.Ordering.Orders.Interfaces;
+using ModularCrm.Products.Integration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,17 +13,33 @@ namespace ModularCrm.Ordering.Orders
 {
     public class OrderAppService : OrderingAppService, IOrderAppService
     {
+        private readonly IProductIntegrationService _productIntegrationService;
         private readonly IRepository<Order> _orderRepository;
 
-        public OrderAppService(IRepository<Order, Guid> orderRepository)
+        public OrderAppService(IRepository<Order, Guid> orderRepository
+            , IProductIntegrationService productIntegrationService)
         {
             _orderRepository = orderRepository;
+            _productIntegrationService = productIntegrationService;
         }
 
         public async Task<List<OrderDto>> GetListAsync()
         {
             var orders = await _orderRepository.GetListAsync();
-            return ObjectMapper.Map<List<Order>, List<OrderDto>>(orders);
+            var ids = orders.Select(x => x.ProductId).Distinct().ToList();
+            var products = (await _productIntegrationService
+                .GetProductsByIdsAsync(ids))
+            .ToDictionary(p => p.Id, p => p.Name);
+
+            var orderDtos = ObjectMapper.Map<List<Order>, List<OrderDto>>(orders);
+
+            orderDtos.ForEach(orderDto =>
+            {
+                orderDto.ProductName = products[orderDto.ProductId];
+            });
+
+            return orderDtos;
+
         }
 
         public async Task CreateAsync(OrderCreationDto input)
