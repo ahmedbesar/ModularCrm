@@ -16,6 +16,7 @@ using ModularCrm.Products.EntityFrameworkCore;
 using ModularCrm.Products.Products;
 using ModularCrm.Ordering.EntityFrameworkCore;
 using ModularCrm.Ordering.Orders;
+using Volo.Abp.EntityFrameworkCore.DistributedEvents;
 
 namespace ModularCrm.EntityFrameworkCore;
 
@@ -29,6 +30,7 @@ public class ModularCrmDbContext :
     AbpDbContext<ModularCrmDbContext>,
     IIdentityDbContext,
     ITenantManagementDbContext,
+    IHasEventOutbox, IHasEventInbox,
     IProductsDbContext,IOrderingDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
@@ -37,7 +39,10 @@ public class ModularCrmDbContext :
 
     public DbSet<Product> Products { get ; set ; }
     public DbSet<Order> Orders { get; set; }
-
+    
+    public DbSet<OutgoingEventRecord> OutgoingEvents { get; set; }
+    public DbSet<IncomingEventRecord> IncomingEvents { get; set; }
+    
     //Identity
     public DbSet<IdentityUser> Users { get; set; }
     public DbSet<IdentityRole> Roles { get; set; }
@@ -62,7 +67,8 @@ public class ModularCrmDbContext :
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
+        builder.ConfigureEventOutbox();
+        builder.ConfigureEventInbox();
         /* Include modules to your migration db context */
 
         builder.ConfigurePermissionManagement();

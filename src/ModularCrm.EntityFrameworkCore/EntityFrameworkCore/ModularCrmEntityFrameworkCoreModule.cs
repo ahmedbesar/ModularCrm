@@ -12,7 +12,9 @@ using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using ModularCrm.Products.EntityFrameworkCore;
 using ModularCrm.Ordering.EntityFrameworkCore;
+using Volo.Abp.EntityFrameworkCore.DistributedEvents;
 using Volo.Abp.EntityFrameworkCore.PostgreSql;
+using Volo.Abp.EventBus.Distributed;
 
 namespace ModularCrm.EntityFrameworkCore;
 
@@ -40,6 +42,19 @@ namespace ModularCrm.EntityFrameworkCore;
 
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        
+        Configure<AbpDistributedEventBusOptions>(options =>
+        {
+            options.Outboxes.Configure(config =>
+            {
+                config.UseDbContext<ModularCrmDbContext>();
+            });
+            options.Inboxes.Configure(config =>
+            {
+                config.UseDbContext<ModularCrmDbContext>();
+            });
+        });
+        
         context.Services.AddAbpDbContext<ModularCrmDbContext>(options =>
         {
                 /* Remove "includeAllEntities: true" to create
