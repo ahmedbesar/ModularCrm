@@ -17,13 +17,14 @@ public class ModularCrmDbContextFactory : IDesignTimeDbContextFactory<ModularCrm
         var configuration = BuildConfiguration();
 
         var builder = new DbContextOptionsBuilder<ModularCrmDbContext>()
-            .UseSqlServer(configuration.GetConnectionString("Default"));
+            .UseNpgsql(configuration.GetConnectionString("Default"));
 
         return new ModularCrmDbContext(builder.Options);
     }
 
     private static IConfigurationRoot BuildConfiguration()
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         var builder = new ConfigurationBuilder()
             .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../ModularCrm.DbMigrator/"))
             .AddJsonFile("appsettings.json", optional: false);
