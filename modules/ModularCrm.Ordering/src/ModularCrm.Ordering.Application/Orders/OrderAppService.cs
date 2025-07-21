@@ -58,6 +58,6 @@ namespace ModularCrm.Ordering.Orders
             await _orderRepository.InsertAsync(order);
             await _distributedEventBus.PublishAsync(
                 new OrderPlacedEto { CustomerName =order.CustomerName,ProductId=order.ProductId});
-        }
+        }   
     }
 }

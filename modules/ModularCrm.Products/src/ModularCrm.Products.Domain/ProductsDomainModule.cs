@@ -1,5 +1,6 @@
-﻿using Volo.Abp.Domain;
+using Volo.Abp.Domain;
 using Volo.Abp.Modularity;
+using Volo.Abp.EventBus.RabbitMq;
 
 namespace ModularCrm.Products;
 
@@ -7,7 +8,8 @@ namespace ModularCrm.Products;
     typeof(AbpDddDomainModule),
     typeof(ProductsDomainSharedModule)
 )]
-public class ProductsDomainModule : AbpModule
+[DependsOn(typeof(AbpEventBusRabbitMqModule))]
+    public class ProductsDomainModule : AbpModule
 {
 
 }

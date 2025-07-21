@@ -49,12 +49,14 @@ namespace ModularCrm.EntityFrameworkCore;
             {
                 config.UseDbContext<ModularCrmDbContext>();
             });
+        });
+        Configure<AbpDistributedEventBusOptions>(options =>
+        {
             options.Inboxes.Configure(config =>
             {
                 config.UseDbContext<ModularCrmDbContext>();
             });
         });
-        
         context.Services.AddAbpDbContext<ModularCrmDbContext>(options =>
         {
                 /* Remove "includeAllEntities: true" to create
